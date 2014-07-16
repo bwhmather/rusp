@@ -8,33 +8,37 @@ pub enum Token<'src> {
 
 pub struct Tokenizer<'src> {
     input: &'src str,
+    cursor: uint,
 }
 
 impl<'src> Iterator<Token<'src>> for Tokenizer<'src> {
     #[inline]
     fn next(&mut self) -> Option<Token<'src>> {
-        let CharRange {ch, next: mut next_token} = self.input.char_range_at(0);
-        let token = match ch {
+        let mut token_start = self.cursor;
+        let CharRange {ch, next: mut token_stop} =
+            self.input.char_range_at(token_start);
+        let token = match self.input.char_at(token_start) {
             '(' => Some(LBrace),
             ')' => Some(RBrace),
             'a'..'z' | 'A'..'Z' | ':' | '_' => {
-                for (idx, ch) in self.input.char_indices() {
-                    next_token = idx;
+                let value = self.input.slice_from(token_start);
+                for (idx, ch) in value.char_indices() {
+                    token_stop = token_start + idx;
                     match ch {
                         'a'..'z' | 'A'..'Z' | ':' | '_' => (),
                         _ => break
                     }
                 };
-                Some(Symbol(self.input.slice_to(next_token)))
+                Some(Symbol(self.input.slice(token_start, token_stop)))
             }
             _ => None
         };
-        self.input = self.input.slice_from(next_token);
+        self.cursor = token_stop;
         return token;
     }
 }
 
 #[inline]
 pub fn tokenize<'src>(input: &'src str) -> Tokenizer<'src> {
-    Tokenizer {input: input}
+    Tokenizer {input: input, cursor: 0}
 }
