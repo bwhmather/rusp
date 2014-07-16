@@ -1,5 +1,6 @@
 use std::str::CharRange;
 
+#[deriving(Clone, PartialEq, Eq, Show)]
 pub enum Token<'src> {
     LBrace,
     RBrace,
@@ -41,4 +42,19 @@ impl<'src> Iterator<Token<'src>> for Tokenizer<'src> {
 #[inline]
 pub fn tokenize<'src>(input: &'src str) -> Tokenizer<'src> {
     Tokenizer {input: input, cursor: 0}
+}
+
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_braces() {
+        let mut tokenizer = tokenize("()(");
+        assert_eq!(tokenizer.next(), Some(LBrace));
+        assert_eq!(tokenizer.next(), Some(RBrace));
+        assert_eq!(tokenizer.next(), Some(LBrace));
+
+    }
 }
