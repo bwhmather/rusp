@@ -7,35 +7,69 @@ pub enum Token<'src> {
     Symbol(&'src str),
 }
 
+#[deriving(Clone, PartialEq, Eq, Show)]
+pub struct TokenizerError;
+
+pub type TokenizerResult<'src> = Result<Token<'src>, TokenizerError>;
+
 pub struct Tokenizer<'src> {
     input: &'src str,
     cursor: uint,
 }
 
-impl<'src> Iterator<Token<'src>> for Tokenizer<'src> {
+impl<'src> Tokenizer<'src> {
+    fn peek_char(&self) -> Option<char> {
+        if (self.cursor >= self.input.len()) {
+            return None
+        } else {
+            return Some(self.input.char_at(self.cursor));
+        }
+    }
+
+    fn pop_char(&mut self) -> Option<char> {
+        if (self.cursor >= self.input.len()) {
+            return None
+        } else {
+            let range = self.input.char_range_at(self.cursor);
+            self.cursor = range.next;
+            return Some(range.ch);
+        }
+    }
+}
+
+
+
+fn symbol_continue(c: Option<char>) -> bool {
+    let c = match c { Some(c) => c, None => return false };
+
+    return (c >= 'a' && c <= 'z')
+        || (c >= 'A' && c <= 'Z')
+        || (c >= '0' && c <= '9')
+        || (c == '_') || (c == '-');
+}
+
+impl<'src> Iterator<TokenizerResult<'src>> for Tokenizer<'src> {
     #[inline]
-    fn next(&mut self) -> Option<Token<'src>> {
-        let mut token_start = self.cursor;
-        let CharRange {ch, next: mut token_stop} =
-            self.input.char_range_at(token_start);
-        let token = match self.input.char_at(token_start) {
-            '(' => Some(LBrace),
-            ')' => Some(RBrace),
+    fn next(&mut self) -> Option<TokenizerResult<'src>> {
+        let c = match self.peek_char() { Some(c) => c, None => return None };
+        match c {
+            '(' => { self.pop_char(); return Some(Ok(LBrace)); },
+            ')' => { self.pop_char(); return Some(Ok(RBrace)); },
             'a'..'z' | 'A'..'Z' | ':' | '_' => {
-                let value = self.input.slice_from(token_start);
-                for (idx, ch) in value.char_indices() {
-                    token_stop = token_start + idx;
-                    match ch {
-                        'a'..'z' | 'A'..'Z' | ':' | '_' => (),
-                        _ => break
-                    }
-                };
-                Some(Symbol(self.input.slice(token_start, token_stop)))
+                let symbol_start = self.cursor;
+                self.pop_char();
+
+                while symbol_continue(self.peek_char()) {
+                    self.pop_char();
+                }
+
+                return Some(Ok(
+                    Symbol(self.input.slice(symbol_start, self.cursor))
+                ));
+
             }
-            _ => None
+            _ => return Some(Err(TokenizerError))
         };
-        self.cursor = token_stop;
-        return token;
     }
 }
 
@@ -52,9 +86,9 @@ mod test {
     #[test]
     fn test_braces() {
         let mut tokenizer = tokenize("()(");
-        assert_eq!(tokenizer.next(), Some(LBrace));
-        assert_eq!(tokenizer.next(), Some(RBrace));
-        assert_eq!(tokenizer.next(), Some(LBrace));
-
+        assert_eq!(tokenizer.next(), Some(Ok(LBrace)));
+        assert_eq!(tokenizer.next(), Some(Ok(RBrace)));
+        assert_eq!(tokenizer.next(), Some(Ok(LBrace)));
+        assert_eq!(tokenizer.next(), None);
     }
 }
