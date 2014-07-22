@@ -37,8 +37,6 @@ impl<'src> Tokenizer<'src> {
     }
 }
 
-
-
 fn symbol_continue(c: Option<char>) -> bool {
     let c = match c { Some(c) => c, None => return false };
 
@@ -49,7 +47,6 @@ fn symbol_continue(c: Option<char>) -> bool {
 }
 
 impl<'src> Iterator<TokenizerResult<'src>> for Tokenizer<'src> {
-    #[inline]
     fn next(&mut self) -> Option<TokenizerResult<'src>> {
         let c = match self.peek_char() { Some(c) => c, None => return None };
         match c {
@@ -73,11 +70,9 @@ impl<'src> Iterator<TokenizerResult<'src>> for Tokenizer<'src> {
     }
 }
 
-#[inline]
 pub fn tokenize<'src>(input: &'src str) -> Tokenizer<'src> {
     Tokenizer {input: input, cursor: 0}
 }
-
 
 #[cfg(test)]
 mod test {
