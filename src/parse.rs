@@ -1,5 +1,3 @@
-use std::str::CharRange;
-
 #[deriving(Clone, PartialEq, Eq, Show)]
 pub enum Token<'src> {
     LBrace,
