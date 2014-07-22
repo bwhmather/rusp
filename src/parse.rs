@@ -17,7 +17,7 @@ pub struct Tokenizer<'src> {
 
 impl<'src> Tokenizer<'src> {
     fn peek_char(&self) -> Option<char> {
-        if (self.cursor >= self.input.len()) {
+        if self.cursor >= self.input.len() {
             return None
         } else {
             return Some(self.input.char_at(self.cursor));
@@ -25,7 +25,7 @@ impl<'src> Tokenizer<'src> {
     }
 
     fn pop_char(&mut self) -> Option<char> {
-        if (self.cursor >= self.input.len()) {
+        if self.cursor >= self.input.len() {
             return None
         } else {
             let range = self.input.char_range_at(self.cursor);
