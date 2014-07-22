@@ -46,9 +46,24 @@ fn is_symbol_body(c: Option<char>) -> bool {
         || (c == '_') || (c == '-');
 }
 
+fn is_whitespace(c: Option<char>) -> bool {
+    let c = match c { Some(c) => c, None => return false };
+
+    return match c {
+        ' ' | '\t' | '\n' => true,
+        _ => false
+    };
+}
+
+
 impl<'src> Iterator<TokenizerResult<'src>> for Tokenizer<'src> {
     fn next(&mut self) -> Option<TokenizerResult<'src>> {
+        while is_whitespace(self.peek_char()) {
+            self.pop_char();
+        }
+
         let c = match self.peek_char() { Some(c) => c, None => return None };
+
         match c {
             '(' => { self.pop_char(); return Some(Ok(LBrace)); },
             ')' => { self.pop_char(); return Some(Ok(RBrace)); },
