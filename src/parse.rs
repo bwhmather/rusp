@@ -3,6 +3,10 @@ pub enum Token<'src> {
     LBrace,
     RBrace,
     Symbol(&'src str),
+    Quote,
+    QuasiQuote,
+    Unquote,
+    Unpack,
 }
 
 #[deriving(Clone, PartialEq, Eq, Show)]
@@ -65,6 +69,10 @@ impl<'src> Iterator<TokenizerResult<'src>> for Tokenizer<'src> {
         match c {
             '(' => { self.pop_char(); return Some(Ok(LBrace)); },
             ')' => { self.pop_char(); return Some(Ok(RBrace)); },
+            '\'' => { self.pop_char(); return Some(Ok(Quote)); },
+            '`' => { self.pop_char(); return Some(Ok(QuasiQuote)); },
+            ',' => { self.pop_char(); return Some(Ok(Unquote)); },
+            '@' => { self.pop_char(); return Some(Ok(Unpack)); },
             'a'..'z' | 'A'..'Z' | ':' | '_' => {
                 let symbol_start = self.cursor;
                 self.pop_char();
