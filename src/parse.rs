@@ -78,7 +78,6 @@ impl<'src> Iterator<TokenizerResult<'src>> for Tokenizer<'src> {
                 return Some(Ok(
                     Symbol(self.input.slice(symbol_start, self.cursor))
                 ));
-
             }
             _ => return Some(Err(TokenizerError))
         };
