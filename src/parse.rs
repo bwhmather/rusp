@@ -101,4 +101,14 @@ mod test {
         assert_eq!(tokenizer.next(), Some(Ok(LBrace)));
         assert_eq!(tokenizer.next(), None);
     }
+
+    #[test]
+    fn test_symbols() {
+        let mut tokenizer = tokenize("aAL_-");
+        assert_eq!(tokenizer.next(), Some(Ok(Symbol("aAL_-"))));
+
+        let mut tokenizer = tokenize("one two");
+        assert_eq!(tokenizer.next(), Some(Ok(Symbol("one"))));
+        assert_eq!(tokenizer.next(), Some(Ok(Symbol("two"))));
+    }
 }
