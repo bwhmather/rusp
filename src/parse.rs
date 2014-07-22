@@ -37,7 +37,7 @@ impl<'src> Tokenizer<'src> {
     }
 }
 
-fn symbol_continue(c: Option<char>) -> bool {
+fn is_symbol_body(c: Option<char>) -> bool {
     let c = match c { Some(c) => c, None => return false };
 
     return (c >= 'a' && c <= 'z')
@@ -56,7 +56,7 @@ impl<'src> Iterator<TokenizerResult<'src>> for Tokenizer<'src> {
                 let symbol_start = self.cursor;
                 self.pop_char();
 
-                while symbol_continue(self.peek_char()) {
+                while is_symbol_body(self.peek_char()) {
                     self.pop_char();
                 }
 
