@@ -95,6 +95,14 @@ mod test {
     use super::*;
 
     #[test]
+    fn test_eof() {
+        let mut tokenizer = tokenize("");
+        assert_eq!(tokenizer.next_token(), Ok(EOF));
+        assert_eq!(tokenizer.next_token(), Ok(EOF));
+        assert_eq!(tokenizer.next_token(), Ok(EOF));
+    }
+
+    #[test]
     fn test_braces() {
         let mut tokenizer = tokenize("()(");
         assert_eq!(tokenizer.next_token(), Ok(LBrace));
