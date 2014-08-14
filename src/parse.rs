@@ -3,6 +3,7 @@ pub enum Token<'src> {
     LBrace,
     RBrace,
     Symbol(&'src str),
+    String(&'src str),
     Quote,
     QuasiQuote,
     Unquote,
@@ -92,6 +93,24 @@ impl<'src> Tokenizer<'src> {
 
                 return Ok(Symbol(self.input.slice(symbol_start, self.cursor)));
             }
+            '"' => {
+                self.pop_char();
+                let string_start = self.cursor;
+
+                loop {
+                    match self.peek_char() {
+                        Some('"') => { break; },
+                        Some('\\') => { self.pop_char(); },
+                        None => {
+                            return TokenizerError::unexpected_eof();
+                        },
+                        _ => {}
+                    }
+                    self.pop_char();
+                }
+
+                return Ok(String(self.input.slice(string_start, self.cursor)));
+            }
             _ => return Err(TokenizerError)
         };
     }
@@ -130,5 +149,11 @@ mod test {
         let mut tokenizer = tokenize("one two");
         assert_eq!(tokenizer.next_token(), Ok(Symbol("one")));
         assert_eq!(tokenizer.next_token(), Ok(Symbol("two")));
+    }
+
+    #[test]
+    fn test_strings() {
+        let mut tokenizer = tokenize(" \"abc\\\"def\"");
+        assert_eq!(tokenizer.next_token(), Ok(String("abc\\\"def")));
     }
 }
