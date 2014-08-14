@@ -1,0 +1,4 @@
+[package]
+name = "rusp"
+version = "0.0.1"
+authors = [ "Ben Mather <bwhmather@bwhmather.com>" ]

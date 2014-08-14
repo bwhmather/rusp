@@ -1,3 +1,2 @@
-/rusp
-/run-tests
-*.rlib
+/target
+/Cargo.lock
