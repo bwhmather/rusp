@@ -13,6 +13,17 @@ pub enum Token<'src> {
 #[deriving(Clone, PartialEq, Eq, Show)]
 pub struct TokenizerError;
 
+impl TokenizerError {
+    fn unexpected_eof<T>() -> Result<T, TokenizerError> {
+        return Err(TokenizerError);
+    }
+
+    fn error<T>() -> Result<T, TokenizerError> {
+        return Err(TokenizerError);
+    }
+}
+
+
 pub type TokenizerResult<'src> = Result<Token<'src>, TokenizerError>;
 
 pub struct Tokenizer<'src> {
