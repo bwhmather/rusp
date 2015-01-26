@@ -1,11 +1,11 @@
 pub use self::Token::*;
 
 #[deriving(Clone, PartialEq, Eq, Show)]
-pub enum Token<'src> {
+pub enum Token {
     LBrace,
     RBrace,
-    Symbol(&'src str),
-    String(&'src str),
+    Symbol(str),
+    String(str),
     Quote,
     QuasiQuote,
     Unquote,
@@ -27,7 +27,7 @@ impl TokenizerError {
 }
 
 
-pub type TokenizerResult<'src> = Result<Token<'src>, TokenizerError>;
+pub type TokenizerResult<'src> = Result<Token, TokenizerError>;
 
 pub struct Tokenizer<'src> {
     input: &'src str,
