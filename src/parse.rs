@@ -1,3 +1,5 @@
+pub use self::Token::*;
+
 #[deriving(Clone, PartialEq, Eq, Show)]
 pub enum Token<'src> {
     LBrace,
@@ -29,7 +31,7 @@ pub type TokenizerResult<'src> = Result<Token<'src>, TokenizerError>;
 
 pub struct Tokenizer<'src> {
     input: &'src str,
-    cursor: uint,
+    cursor: usize,
 }
 
 fn is_symbol_body(c: Option<char>) -> bool {
@@ -83,7 +85,7 @@ impl<'src> Tokenizer<'src> {
             '`' => { self.pop_char(); return Ok(QuasiQuote); },
             ',' => { self.pop_char(); return Ok(Unquote); },
             '@' => { self.pop_char(); return Ok(Unpack); },
-            'a'..'z' | 'A'..'Z' | ':' | '_' => {
+            'a'...'z' | 'A'...'Z' | ':' | '_' => {
                 let symbol_start = self.cursor;
                 self.pop_char();
 
