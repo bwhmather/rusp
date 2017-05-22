@@ -1,0 +1,9 @@
+[package]
+name = "lisp"
+version = "0.1.0"
+authors = ["Ben Mather <bwhmather@bwhmather.com>"]
+
+[lib]
+doctest = false
+
+[dependencies]
