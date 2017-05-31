@@ -31,6 +31,7 @@ where I: Iterator<Item = Token> {
                 loop {
                     match tokens.peek() {
                         Some(&Token::RBracket) => {
+                            tokens.next();
                             break;
                         }
                         None => {
@@ -48,6 +49,9 @@ where I: Iterator<Item = Token> {
             }
             Token::Int(i) => {
                 return Ok(Expression::Int(i));
+            }
+            Token::Symbol(s) => {
+                return Ok(Expression::Symbol(s));
             }
             _ => {
                 return Err("unrecognized");
@@ -72,6 +76,19 @@ mod tests {
     use parser::{Expression, read};
 
     #[test]
+    fn test_symbol() {
+        let tokens = tokenize(
+            "symbol"
+        ).unwrap();
+
+        assert_eq!(
+            read(tokens).unwrap(),
+            Expression::Symbol(String::from("symbol"))
+        )
+    }
+
+
+    #[test]
     fn test_simple() {
         let tokens = tokenize(
             "(define circle-area (lambda (r) (* pi (* r r))))"
@@ -80,6 +97,7 @@ mod tests {
         assert_eq!(
             read(tokens).unwrap(),
             Expression::List(vec![
+                Expression::Symbol(String::from("define")),
                 Expression::Symbol(String::from("circle-area")),
                 Expression::List(vec![
                     Expression::Symbol(String::from("lambda")),
@@ -90,6 +108,7 @@ mod tests {
                         Expression::Symbol(String::from("*")),
                         Expression::Symbol(String::from("pi")),
                         Expression::List(vec![
+                            Expression::Symbol(String::from("*")),
                             Expression::Symbol(String::from("r")),
                             Expression::Symbol(String::from("r"))
                         ])
