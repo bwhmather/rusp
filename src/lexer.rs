@@ -1,15 +1,7 @@
 use std::result;
 
-pub use self::Token::*;
-
-#[derive(PartialEq, Clone, Debug)]
-pub enum Token {
-    LBracket,
-    RBracket,
-    Symbol(String),
-    Int(i64),
-    Str(String),
-}
+use types::Token;
+use types::Token::*;
 
 
 type LexerError = &'static str;
@@ -173,7 +165,8 @@ pub fn tokenize(chars: &str) -> Result<Vec<Token>> {
 
 #[cfg(test)]
 mod tests {
-    use lexer::*;
+    use lexer::tokenize;
+    use types::Token::*;
 
     #[test]
     fn test_brackets() {

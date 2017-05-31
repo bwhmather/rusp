@@ -1,19 +1,9 @@
 use std::result;
 use std::iter::Peekable;
 
-use lexer::{Lexer, Token};
+use types::{Token, Expression};
+use lexer::Lexer;
 use lexer;
-
-pub use self::Expression::*;
-
-
-#[derive(PartialEq, Clone, Debug)]
-pub enum Expression {
-    List(Vec<Expression>),
-    Int(i64),
-    Str(String),
-    Symbol(String),
-}
 
 
 type ParserError = &'static str;
@@ -72,8 +62,9 @@ where I: IntoIterator<Item = Token> {
 
 #[cfg(test)]
 mod tests {
+    use types::Expression;
     use lexer::tokenize;
-    use parser::{Expression, read};
+    use parser::read;
 
     #[test]
     fn test_symbol() {
