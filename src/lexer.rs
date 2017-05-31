@@ -85,7 +85,9 @@ impl<'a> Lexer<'a> {
 
         loop {
             match self.peek_char() {
-                Some('a'...'z') | Some('-') => {}
+                Some('a'...'z') | Some('-') | Some('*') => {
+                    self.pop_char();
+                }
                 _ => {break;}
             }
         }
@@ -164,7 +166,6 @@ pub fn tokenize(chars: &str) -> Result<Vec<Token>> {
     }
 
     return Ok(tokens);
-
 }
 
 
@@ -215,6 +216,14 @@ mod tests {
         assert_eq!(
             tokenize("-01"),
             Ok(vec![Int(-1)])
+        );
+    }
+
+    #[test]
+    fn test_symbols() {
+        assert_eq!(
+            tokenize("symbol"),
+            Ok(vec![Symbol(String::from("symbol"))])
         );
     }
 }
