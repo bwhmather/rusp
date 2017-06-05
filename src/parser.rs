@@ -109,30 +109,3 @@ mod tests {
         );
     }
 }
-
-
-
-
-
-//
-//
-//pub fn read() {
-//    let mut parser = Parser::new();
-//
-//    for token in tokens {
-//
-//
-//        match parser.push(token) {
-//            More(parser) => {
-//                parser,
-//            }
-//            Done(expression) => return expression,
-//        }
-//    }
-//
-//    Err("unexpexted EOF")
-//}
-//
-//pub fn parse(input: &str) -> Result<Expression> {
-//    unimplemented!();
-//}
