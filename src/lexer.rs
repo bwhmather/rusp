@@ -77,7 +77,7 @@ impl<'a> Lexer<'a> {
 
         loop {
             match self.peek_char() {
-                Some('a'...'z') | Some('-') | Some('*') => {
+                Some('a'...'z') | Some('+') | Some('-') | Some('*') => {
                     self.pop_char();
                 }
                 _ => {break;}
