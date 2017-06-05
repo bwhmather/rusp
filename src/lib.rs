@@ -2,9 +2,26 @@ pub mod types;
 pub mod lexer;
 pub mod parser;
 
+use std::collections::HashMap;
 use std::rc::Rc;
 
 use types::Expression;
+
+
+#[derive(PartialEq, Clone, Debug)]
+pub struct Environment {
+    parent: Option<Rc<Closure>>,
+    bindings: HashMap<String, Value>,
+}
+
+impl Environment {
+    fn new() -> Self {
+        Environment {
+            parent: None,
+            bindings: HashMap::new(),
+        }
+    }
+}
 
 
 #[derive(PartialEq, Clone, Debug)]
@@ -24,7 +41,7 @@ fn op_add(args: &[Value]) -> Value {
 }
 
 
-fn eval(expr: &Expression) -> Value {
+fn eval(env: &mut Environment, expr: &Expression) -> Value {
     match expr {
         &Expression::List(ref elements) => {
             match elements[0] {
@@ -38,7 +55,9 @@ fn eval(expr: &Expression) -> Value {
                         }
                         "+" => {
                             let args: Vec<Value> =
-                                elements[1..].iter().map(eval).collect();
+                                elements[1..].iter().map(
+                                    |arg| {eval(env, arg)}
+                                ).collect();
                             op_add(&args)
                         }
                         _ => {
@@ -69,15 +88,16 @@ fn eval(expr: &Expression) -> Value {
 mod tests {
     use lexer::tokenize;
     use parser::read;
-    use Value;
+    use {Value, Environment};
     use eval;
 
     #[test]
     fn test_add() {
         let expr = read(tokenize("(+ 1 1)").unwrap()).unwrap();
+        let mut env = Environment::new();
 
         assert_eq!(
-            eval(&expr),
+            eval(&mut env, &expr),
             Value::Int(2)
         )
     }
