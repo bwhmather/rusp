@@ -78,6 +78,22 @@ mod tests {
         )
     }
 
+    #[test]
+    fn test_add() {
+        let tokens = tokenize(
+            "(+ 1 1)"
+        ).unwrap();
+        println!("tokens: {:?}", tokens);
+
+        assert_eq!(
+            read(tokens).unwrap(),
+            Expression::List(vec![
+                Expression::Symbol(String::from("+")),
+                Expression::Int(1),
+                Expression::Int(1)
+            ])
+        );
+    }
 
     #[test]
     fn test_simple() {
