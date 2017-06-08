@@ -10,14 +10,12 @@ use types::Expression;
 
 #[derive(PartialEq, Clone, Debug)]
 pub struct Environment {
-    parent: Option<Rc<Closure>>,
     bindings: HashMap<String, Value>,
 }
 
 impl Environment {
     fn new() -> Self {
         Environment {
-            parent: None,
             bindings: HashMap::new(),
         }
     }
@@ -41,7 +39,7 @@ fn op_add(args: &[Value]) -> Value {
 }
 
 
-fn eval(env: &mut Environment, expr: &Expression) -> Value {
+fn eval(env: &Environment, expr: &Expression) -> Value {
     match expr {
         &Expression::List(ref elements) => {
             match elements[0] {
@@ -50,8 +48,22 @@ fn eval(env: &mut Environment, expr: &Expression) -> Value {
                         "if" => {
                             unimplemented!();
                         }
-                        "define" => {
-                            unimplemented!();
+                        "let" => {
+                            let mut scope = env.clone();
+
+                            let bindings = elements[1].expect_list();
+                            for binding_expr in bindings {
+                                let binding = binding_expr.expect_list();
+
+                                let binding_name = binding[0].expect_symbol();
+                                let binding_value = eval(env, &binding[1]);
+
+                                scope.bindings.insert(
+                                    String::from(binding_name), binding_value,
+                                );
+                            }
+
+                            eval(&scope, &elements[2])
                         }
                         "+" => {
                             let args: Vec<Value> =
@@ -61,7 +73,7 @@ fn eval(env: &mut Environment, expr: &Expression) -> Value {
                             op_add(&args)
                         }
                         _ => {
-                            unimplemented!();
+                            env.bindings.get(name).unwrap().clone()
                         }
                     }
                 }
@@ -75,7 +87,7 @@ fn eval(env: &mut Environment, expr: &Expression) -> Value {
 
         }
         &Expression::Symbol(ref name) => {
-            unimplemented!();
+            env.bindings.get(name).unwrap().clone()
         }
         _ => {
             unimplemented!();
@@ -94,11 +106,24 @@ mod tests {
     #[test]
     fn test_add() {
         let expr = read(tokenize("(+ 1 1)").unwrap()).unwrap();
-        let mut env = Environment::new();
+        let env = Environment::new();
 
         assert_eq!(
-            eval(&mut env, &expr),
+            eval(&env, &expr),
             Value::Int(2)
         )
+    }
+
+    #[test]
+    fn test_let() {
+        let expr = read(tokenize(
+            "(let ((a 1) (b 2)) (+ a b))"
+        ).unwrap()).unwrap();
+        let env = Environment::new();
+
+        assert_eq!(
+            eval(&env, &expr),
+            Value::Int(3)
+        );
     }
 }
